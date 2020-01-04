@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'MatchCard.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,12 +26,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List<Widget> cardList;
 
-  void _incrementCounter() {
+  void _removeCard(int index) {
     setState(() {
-      _counter++;
+      cardList.removeAt(index);
     });
+
+    if (cardList.length == 0) {
+      cardList = _getMatchCard();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    cardList = _getMatchCard();
   }
 
   @override
@@ -44,49 +55,54 @@ class _MyHomePageState extends State<MyHomePage> {
           alignment: Alignment.center,
           // カードの配置をtopでずらす。
           // 手前のカードほどカードを大きくするようにするため、手前程widthを広げる。
-          children: <Widget>[
-            Positioned(
-              top: 10.0,
-              child: Card(
-                elevation: 10.0,
-                color: Colors.red,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Container(
-                  width: 310.0,
-                  height: 500.0,
-                ),
-              ),
-            ),
-            Positioned(
-              top: 20.0,
-              child: Card(
-                elevation: 10.0,
-                color: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Container(
-                  width: 330.0,
-                  height: 500.0,
-                ),
-              ),
-            ),
-            Positioned(
-              top: 30.0,
-              child: Card(
-                elevation: 10.0,
-                color: Colors.greenAccent,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Container(
-                  width: 350.0,
-                  height: 500.0,
-                ),
-              ),
-            ),
-          ],
+          children: cardList
         ),
       ),
     );
+  }
+
+  List<Widget> _getMatchCard() {
+    List<MatchCard> cards = new List();
+    cards.add(MatchCard(255, 0, 0, 10));
+    cards.add(MatchCard(0, 255, 0, 20));
+    cards.add(MatchCard(0, 0, 255, 30));
+
+    List<Widget> cardList = new List();
+
+    for (int x = 0; x < 3; x++) {
+      cardList.add(
+        Positioned(
+          top: cards[x].margin,
+          child: Draggable(
+            onDragEnd: (drag) {
+              _removeCard(x);
+            },
+            childWhenDragging: Container(),
+            feedback: Card(
+              elevation: 10.0,
+              color: Color.fromARGB(255, cards[x].redColor, cards[x].greenColor, cards[x].blueColor),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              child: Container(
+                width: 350.0,
+                height: 500.0,
+              ),
+            ),
+            child: Card(
+              elevation: 10.0,
+              color: Color.fromARGB(255, cards[x].redColor, cards[x].greenColor, cards[x].blueColor),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              child: Container(
+                width: 350.0,
+                height: 500.0,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return cardList;
   }
 }
